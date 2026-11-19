@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RXP Decryption Tool (Local)</title>
+<title>RXP Decryption Tool</title>
 <style>
   :root {
     --bg: #1e1e2e;
@@ -26,18 +26,19 @@
     color: var(--text);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
-    padding: 24px 20px 48px;
+    padding: 20px;
   }
 
   .container {
     background: var(--surface);
     border-radius: 16px;
-    padding: 36px;
+    padding: 40px;
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
     margin: 0 auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(137,180,250,0.1);
     position: relative;
+    overflow: hidden;
   }
 
   .container::before {
@@ -45,19 +46,19 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
-    border-radius: 16px 16px 0 0;
     background: linear-gradient(90deg, var(--accent), #b4befe, var(--accent));
-    opacity: 0.75;
+    opacity: 0.7;
   }
 
   .logo {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
 
   .logo h1 {
-    font-size: 1.55rem;
+    font-size: 1.6rem;
     font-weight: 700;
+    letter-spacing: -0.5px;
     background: linear-gradient(135deg, var(--accent), #b4befe);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -71,15 +72,15 @@
   }
 
   .field-group {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
   }
 
   .field-group label {
     display: block;
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     color: var(--subtext);
     margin-bottom: 6px;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -93,18 +94,22 @@
     background: var(--bg);
     border: 1px solid var(--overlay);
     border-radius: 8px;
-    padding: 11px 14px;
+    padding: 12px 14px;
     color: var(--text);
     font-size: 0.95rem;
     font-family: inherit;
     width: 100%;
-    outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
   }
 
-  input:focus, select:focus {
+  input[type="text"]:focus, input[type="password"]:focus, select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(137,180,250,0.15);
+  }
+
+  input[type="text"]::placeholder, input[type="password"]::placeholder {
+    color: var(--muted);
   }
 
   select {
@@ -118,16 +123,16 @@
 
   .btn-primary {
     width: 100%;
-    padding: 13px;
+    padding: 14px;
     background: linear-gradient(135deg, var(--accent), #7aa2f8);
     color: var(--bg);
     border: none;
     border-radius: 8px;
-    font-size: 0.98rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.2s;
-    margin-top: 6px;
+    margin-top: 8px;
   }
 
   .btn-primary:hover {
@@ -135,22 +140,21 @@
     box-shadow: 0 6px 20px rgba(137,180,250,0.3);
   }
 
-  .btn-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
+  .btn-primary:active {
+    transform: translateY(0);
   }
 
   .btn-secondary {
-    flex: 1;
+    width: 100%;
     padding: 10px;
     background: var(--overlay);
     color: var(--text);
     border: none;
     border-radius: 8px;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: background 0.2s;
+    margin-top: 10px;
   }
 
   .btn-secondary:hover {
@@ -159,11 +163,11 @@
 
   .result-area {
     margin-top: 16px;
-    animation: fadeIn 0.25s ease;
+    animation: fadeIn 0.3s ease;
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-6px); }
+    from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
@@ -177,111 +181,67 @@
     font-size: 0.75rem;
     font-family: 'Consolas', monospace;
     resize: vertical;
+    margin-bottom: 10px;
+  }
+
+  .result-area textarea:focus {
+    outline: none;
+    border-color: var(--accent);
   }
 
   .stats-card {
     background: var(--bg);
     border: 1px solid var(--overlay);
     border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
     font-size: 0.82rem;
     line-height: 1.7;
   }
 
-  .stat-row {
+  .stats-card .stat-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
-  .stat-label { color: var(--muted); }
-  .stat-value { color: var(--text); font-weight: 600; font-family: 'Consolas', monospace; }
-
-  .status {
-    text-align: center;
-    font-size: 0.82rem;
+  .stats-card .stat-label {
     color: var(--muted);
-    margin-top: 14px;
-    min-height: 1.2em;
   }
 
-  .status.success { color: var(--green); }
-  .status.error { color: var(--red); }
-  .status.info { color: var(--accent); }
-
-  .footer {
-    text-align: center;
-    margin-top: 18px;
-    font-size: 0.75rem;
-    color: var(--muted);
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .history-dropdown {
-    position: relative;
-  }
-
-  .btn-history {
-    background: var(--overlay);
-    border: none;
+  .stats-card .stat-value {
     color: var(--text);
-    padding: 11px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: 'Consolas', monospace;
   }
 
-  .btn-history:hover { background: #565a72; }
-
-  .history-list {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    min-width: 180px;
-    background: var(--surface);
-    border: 1px solid var(--overlay);
-    border-radius: 8px;
-    margin-top: 4px;
-    z-index: 10;
-    display: none;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-
-  .history-list.open { display: block; }
-
-  .history-item {
-    padding: 9px 14px;
-    cursor: pointer;
-    font-size: 0.85rem;
-  }
-
-  .history-item:hover { background: var(--overlay); }
-
+  /* Dev Panel */
   .dev-panel {
     display: none;
-    margin-top: 20px;
-    padding: 18px;
+    margin-top: 24px;
+    padding: 20px;
     background: var(--bg);
     border: 1px solid var(--overlay);
     border-radius: 12px;
+    animation: fadeIn 0.3s ease;
   }
 
   .dev-panel h3 {
     font-size: 0.9rem;
     color: var(--yellow);
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
 
   .drop-zone {
     border: 2px dashed var(--overlay);
     border-radius: 8px;
-    padding: 18px;
+    padding: 24px;
     text-align: center;
     color: var(--muted);
     cursor: pointer;
-    margin-bottom: 10px;
-    font-size: 0.82rem;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
   }
 
   .drop-zone:hover, .drop-zone.dragover {
@@ -296,30 +256,88 @@
 
   .dev-files {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
-  .dev-file-slot { flex: 1; }
+  .dev-file-slot {
+    flex: 1;
+  }
+
   .dev-file-slot label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--subtext);
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    font-weight: 500;
   }
 
-  .sound-toggle {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: none;
-    border: none;
+  .status {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 14px;
+    min-height: 1.2em;
+    transition: color 0.3s;
+  }
+
+  .status.success { color: var(--green); }
+  .status.error { color: var(--red); }
+  .status.info { color: var(--accent); }
+
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.75rem;
+    color: var(--muted);
     cursor: pointer;
-    font-size: 1rem;
-    opacity: 0.6;
   }
 
-  .sound-toggle:hover { opacity: 1; }
+  .history-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .btn-history {
+    background: var(--overlay);
+    border: none;
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-history:hover { background: #565a72; }
+
+  .history-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--overlay);
+    border-radius: 8px;
+    margin-top: 4px;
+    z-index: 10;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .history-list.open { display: block; }
+
+  .history-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.15s;
+  }
+
+  .history-item:hover { background: var(--overlay); }
+  .history-item:first-child { border-radius: 8px 8px 0 0; }
+  .history-item:last-child { border-radius: 0 0 8px 8px; }
 
   .toast {
     position: fixed;
@@ -328,12 +346,12 @@
     transform: translateX(-50%) translateY(80px);
     background: var(--green);
     color: var(--bg);
-    padding: 11px 22px;
+    padding: 12px 24px;
     border-radius: 8px;
     font-weight: 600;
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     opacity: 0;
-    transition: transform 0.25s, opacity 0.25s;
+    transition: transform 0.3s, opacity 0.3s;
     z-index: 100;
   }
 
@@ -341,104 +359,235 @@
     transform: translateX(-50%) translateY(0);
     opacity: 1;
   }
+
+  /* Landing section */
+  .landing {
+    width: 100%;
+    background: var(--bg);
+    padding: 60px 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .landing-inner {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .landing-badge {
+    font-size: 0.8rem;
+    color: var(--green);
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+
+  .landing-title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .landing-card {
+    background: var(--surface);
+    border: 1px solid var(--overlay);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    text-align: left;
+  }
+
+  .card-header {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 12px;
+  }
+
+  .card-list {
+    list-style: none;
+    padding: 0;
+    color: var(--subtext);
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+
+  .card-list li { margin-bottom: 6px; padding-left: 16px; position: relative; }
+  .card-list li::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
+  .card-list strong { color: var(--text); }
+
+  .landing-cta {
+    display: inline-block;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--accent), #7aa2f8);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+
+  .landing-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(137,180,250,0.3);
+  }
+
+  .howto {
+    max-width: 480px;
+    margin: 24px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--overlay);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+
+  .howto h3 {
+    font-size: 0.9rem;
+    color: var(--green);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .howto ol {
+    padding-left: 18px;
+    color: var(--subtext);
+    font-size: 0.85rem;
+    line-height: 1.8;
+  }
+
+  .howto strong { color: var(--text); }
+
+  .sound-toggle {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+
+  .sound-toggle:hover { opacity: 1; }
 </style>
 </head>
 <body>
 
-<div class="container" id="toolSection">
-  <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">🔊</button>
+<div class="landing" id="landing">
+  <div class="landing-inner">
+    <div class="landing-badge">RXPFree /</div>
+    <h1 class="landing-title">Skip the paywall.<br>Forever Guides, free.</h1>
+    <div class="landing-card">
+      <div class="card-header">🔒 Private by design</div>
+      <ul class="card-list">
+        <li><strong>Your tag stays on your machine.</strong> No server ever sees it.</li>
+        <li><strong>No cookies, no analytics.</strong> This page talks to nothing but GitHub's raw file host.</li>
+        <li><strong>Takes 5 seconds.</strong> Paste the result into WoW and you're done.</li>
+      </ul>
+    </div>
+    <button class="landing-cta" onclick="scrollToTool()">Get your guide ↓</button>
+  </div>
+</div>
 
+<div class="container" id="toolSection">
   <div class="logo">
-    <h1>RXP Guide Generator</h1>
-    <p>Local client-side key derivation &amp; re-encryption</p>
+    <h1>Generate Your Guide</h1>
+    <p>Paste into RXPGuides to unlock</p>
   </div>
 
   <div class="field-group">
-    <label for="battletag">BattleTag</label>
+    <label>Your BattleTag</label>
     <div class="input-row">
       <input type="text" id="battletag" placeholder="Name#1234" autocomplete="off" spellcheck="false">
       <div class="history-dropdown">
-        <button class="btn-history" type="button" onclick="toggleHistory()">🕐</button>
+        <button class="btn-history" onclick="toggleHistory()">🕐</button>
         <div class="history-list" id="historyList"></div>
       </div>
     </div>
   </div>
 
   <div class="field-group">
-    <label for="language">Language</label>
+    <label>Language</label>
     <select id="language" onchange="updateFooter()">
-      <option value="en">English (guide.txt)</option>
-      <option value="de">German / Deutsch (guide_de.txt)</option>
+      <option value="en">English</option>
+      <option value="de">German (Deutsch)</option>
     </select>
   </div>
 
-  <div class="field-group">
-    <label>Local Source Override (Optional)</label>
-    <div class="drop-zone" id="localSourceDrop">
-      <span>Drop a local encrypted or plain guide .txt file here, or click to select</span>
-      <input type="file" id="localSourceFile" accept=".txt" hidden>
-    </div>
-  </div>
-
-  <button class="btn-primary" id="mainBtn" type="button" onclick="generateGuide()">Generate Guide</button>
-
-  <div class="btn-row">
-    <button class="btn-secondary" type="button" onclick="checkUpdate()">Check for Updates</button>
-    <button class="btn-secondary" type="button" onclick="clearLocalSource()">Clear Local File</button>
-  </div>
+  <button class="btn-primary" id="mainBtn" onclick="generateGuide()">Generate Guide</button>
+  <button class="btn-secondary" onclick="checkUpdate()">Check for Updates</button>
 
   <div class="result-area" id="resultArea" style="display:none;">
     <div class="stats-card" id="statsCard"></div>
     <textarea id="guideOutput" readonly rows="4"></textarea>
   </div>
 
-  <div class="status" id="status">Ready.</div>
+  <div class="status" id="status">Enter your BattleTag and click Generate</div>
 
-  <div class="footer" id="footerInfo" onclick="footerClick()">v1.0 local | made by slcker</div>
+  <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">🔊</button>
 
+  <!-- Hidden Dev Panel -->
   <div class="dev-panel" id="devPanel">
-    <h3>⚙️ Owner Panel (GitHub Push)</h3>
+    <h3>⚙️ Owner Panel</h3>
+
     <div class="field-group">
-      <label for="ghToken">GitHub Token</label>
+      <label>GitHub Token (fine-grained PAT)</label>
       <input type="password" id="ghToken" placeholder="ghp_xxxx... or github_pat_...">
     </div>
+
     <div class="dev-files">
       <div class="dev-file-slot">
         <label>English (guide.txt)</label>
         <div class="drop-zone" id="dropZoneEN">
-          <span>Drop EN guide</span>
+          <span>Drop EN guide or click</span>
           <input type="file" id="devFileEN" accept=".txt" hidden>
         </div>
       </div>
       <div class="dev-file-slot">
         <label>German (guide_de.txt)</label>
         <div class="drop-zone" id="dropZoneDE">
-          <span>Drop DE guide</span>
+          <span>Drop DE guide or click</span>
           <input type="file" id="devFileDE" accept=".txt" hidden>
         </div>
       </div>
     </div>
-    <button class="btn-primary" type="button" onclick="pushGuides()">Push to Repo</button>
+
+    <button class="btn-primary" onclick="pushGuides()">Push to Repo</button>
     <div class="status" id="devStatus"></div>
+  </div>
+
+  <div class="howto">
+    <h3>How to use</h3>
+    <ol>
+      <li><strong>Copy</strong> your guide string from above</li>
+      <li>In WoW → RXPGuides menu → <strong>Import guide</strong></li>
+      <li>Paste (Ctrl+V) → click <strong>Import</strong></li>
+    </ol>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// === CONFIG ===
 const _cfg = [95, 86, 95, 86, 20, 1, 0, 1, 0];
 const ORIGINAL_TAG = _cfg.map(v => String.fromCharCode(v ^ 0x37)).join('');
-const REPO_OWNER = "Inariaa";
-const REPO_NAME = "rxp_decrypter";
+const REPO_OWNER = "Purplexcity";
+const REPO_NAME = "xpr";
 const BRANCH = "main";
+const COMMIT_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
+// Embedded fallback (base64 of zlib-compressed guide text) — set by BuildTool or left empty for web-only
 let EMBEDDED_EN_B64 = "";
 let EMBEDDED_DE_B64 = "";
 
-let _guideCache = {};
-let _localSourceText = { en: null, de: null };
-let _guideGenerated = false;
-
+// === RC4 Implementation ===
 function rc4(data, key) {
   const S = new Uint8Array(256);
   for (let i = 0; i < 256; i++) S[i] = i;
@@ -458,12 +607,8 @@ function rc4(data, key) {
   return out;
 }
 
-function asciiLower(s) {
-  return s.replace(/[A-Z]/g, c => String.fromCharCode(c.charCodeAt(0) + 32));
-}
-
 function deriveKey(baseStr) {
-  const raw = new TextEncoder().encode(asciiLower(baseStr));
+  const raw = new TextEncoder().encode(baseStr.toLowerCase());
   const buf = new Uint8Array(16);
   const len = Math.min(raw.length, 16);
   const offset = 16 - len;
@@ -477,6 +622,7 @@ function deriveKey(baseStr) {
   return buf;
 }
 
+// === Base64 helpers ===
 function b64ToBytes(b64) {
   const bin = atob(b64);
   const bytes = new Uint8Array(bin.length);
@@ -493,77 +639,103 @@ function bytesToB64(bytes) {
   return btoa(binary);
 }
 
+// === Adler-32 checksum ===
+function adler32(data) {
+  let a = 1, b = 0;
+  for (let i = 0; i < data.length; i++) {
+    a = (a + data[i]) % 65521;
+    b = (b + a) % 65521;
+  }
+  return ((b << 16) | a) >>> 0;
+}
+
+// === Guide fetching with in-memory cache ===
+const _guideCache = {};
+
+function guideFilename(locale) {
+  return locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
+}
+
+async function fetchGuide(locale, forceRefresh = false) {
+  if (_guideCache[locale] && !forceRefresh) return _guideCache[locale];
+  const fname = guideFilename(locale);
+  const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${fname}`;
+  const resp = await fetch(url, forceRefresh ? { cache: 'no-store' } : {});
+  if (!resp.ok) throw new Error(`Guide download failed (HTTP ${resp.status})`);
+  const data = await resp.text();
+  if (!data.includes('|')) throw new Error("Server returned invalid data");
+  _guideCache[locale] = data;
+  return data;
+}
+
+function parseEncrypted(data, originalTag) {
+  const m = data.match(/^(\d+)\|(\d+):{1,2}([A-Za-z0-9+/=]+)%/);
+  if (!m) throw new Error("Invalid guide format (no match)");
+
+  const b64Payload = m[3];
+  const cipherBytes = b64ToBytes(b64Payload);
+  const key = deriveKey(originalTag);
+  const decrypted = rc4(cipherBytes, key);
+  const textBytes = zlibDecompressSync(decrypted);
+  return new TextDecoder().decode(textBytes);
+}
+
+function zlibDecompressSync(data) {
+  if (typeof pako !== 'undefined') {
+    return new Uint8Array(pako.inflate(data));
+  }
+  throw new Error("pako not loaded");
+}
+
 function loadPako() {
   return new Promise((resolve, reject) => {
     if (typeof pako !== 'undefined') { resolve(); return; }
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
     script.onload = resolve;
-    script.onerror = () => reject(new Error("Failed to load pako from CDN"));
+    script.onerror = () => reject(new Error("Failed to load pako library"));
     document.head.appendChild(script);
   });
 }
 
-async function fetchGuide(locale, forceRefresh = false) {
-  if (_guideCache[locale] && !forceRefresh) return _guideCache[locale];
-  const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
-  const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${fname}`;
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`Guide download failed (HTTP ${resp.status})`);
-  const data = await resp.text();
-  if (!data.includes('|')) throw new Error("Invalid guide data");
-  _guideCache[locale] = data;
-  return data;
-}
-
-function parseEncrypted(data, originalTag) {
-  const m = data.match(/^(\d+)\|(\d+):([A-Za-z0-9+/=]+)%/);
-  if (!m) throw new Error("Invalid encrypted guide format");
-  const cipherBytes = b64ToBytes(m[3]);
-  const key = deriveKey(originalTag);
-  const decrypted = rc4(cipherBytes, key);
-  const textBytes = new Uint8Array(pako.inflate(decrypted));
-  return new TextDecoder().decode(textBytes);
-}
-
-async function getPlainText(locale) {
-  if (_localSourceText[locale]) {
-    const raw = _localSourceText[locale];
-    if (raw.includes('|') && raw.includes(':')) {
-      return parseEncrypted(raw, ORIGINAL_TAG);
-    }
-    return raw;
-  }
-
+// === Main logic ===
+async function getPlainText(locale, forceRefresh = false) {
   try {
-    const data = await fetchGuide(locale);
+    const data = await fetchGuide(locale, forceRefresh);
     if (data.includes('|') && data.includes(':')) {
       return parseEncrypted(data, ORIGINAL_TAG);
     }
   } catch (e) {
-    console.warn("GitHub fetch failed:", e.message);
+    console.warn("GitHub fetch failed, trying embedded:", e && e.message ? e.message : String(e));
   }
 
   const b64 = locale === 'en' ? EMBEDDED_EN_B64 : EMBEDDED_DE_B64;
   if (b64) {
-    const bytes = b64ToBytes(b64);
-    return new TextDecoder().decode(new Uint8Array(pako.inflate(bytes)));
+    try {
+      await loadPako();
+      const bytes = b64ToBytes(b64);
+      return new TextDecoder().decode(new Uint8Array(pako.inflate(bytes)));
+    } catch (e2) {
+      console.warn("Embedded fallback also failed:", e2 && e2.message ? e2.message : String(e2));
+    }
   }
 
-  throw new Error("No guide source available. Drop a local .txt file or check network access.");
+  throw new Error("No guide data available. Check your internet connection.");
 }
+
+let _guideGenerated = false;
 
 async function generateGuide() {
   if (_guideGenerated) {
     await navigator.clipboard.writeText(document.getElementById('guideOutput').value);
-    setStatus("Copied to clipboard! Paste into RXPGuides.", "success");
+    setStatus("Copied! Paste into RXPGuides.", "success");
     showToast("Copied to clipboard!");
     return;
   }
 
   const tag = document.getElementById('battletag').value.trim();
   if (!tag) {
-    setStatus("Enter a BattleTag first.", "error");
+    setStatus("Please enter your BattleTag first.", "error");
     return;
   }
   if (!/^[^#]+#\d+$/.test(tag)) {
@@ -578,36 +750,33 @@ async function generateGuide() {
     await loadPako();
 
     const text = await getPlainText(locale);
+    const plainBytes = new TextEncoder().encode(text);
     const keyNew = deriveKey(tag);
-    const zlibData = new Uint8Array(pako.deflate(new TextEncoder().encode(text), { level: 6 }));
+    const zlibData = new Uint8Array(pako.deflate(plainBytes, { level: 6 }));
+
     const cipher = rc4(zlibData, keyNew);
     const b64Out = bytesToB64(cipher);
-
-    const checkVal = (
-      (zlibData[zlibData.length - 4] << 24) |
-      (zlibData[zlibData.length - 3] << 16) |
-      (zlibData[zlibData.length - 2] << 8) |
-      zlibData[zlibData.length - 1]
-    ) >>> 0;
+    const checkVal = adler32(plainBytes);
 
     const guideCount = (text.match(/^#name/gm) || []).length;
     const content = `${guideCount}|${checkVal}:${b64Out}%|40000`;
-
     saveTagToHistory(tag);
     playDing();
 
     document.getElementById('guideOutput').value = content;
+
     const sizeMB = (new Blob([content]).size / (1024 * 1024)).toFixed(2);
     document.getElementById('statsCard').innerHTML = `
       <div class="stat-row"><span class="stat-label">BattleTag</span><span class="stat-value">${tag}</span></div>
       <div class="stat-row"><span class="stat-label">Guides</span><span class="stat-value">${guideCount}</span></div>
+      <div class="stat-row"><span class="stat-label">Checksum</span><span class="stat-value">${checkVal}</span></div>
       <div class="stat-row"><span class="stat-label">Size</span><span class="stat-value">${sizeMB} MB</span></div>
     `;
 
     document.getElementById('resultArea').style.display = 'block';
     _guideGenerated = true;
     document.getElementById('mainBtn').textContent = "Copy to Clipboard";
-    setStatus(`Generated ${guideCount} guides. Click again to copy.`, "success");
+    setStatus(`Generated ${guideCount} guides. Click button again to copy.`, "success");
   } catch (err) {
     setStatus(`Error: ${err.message}`, "error");
   }
@@ -627,33 +796,41 @@ async function checkUpdate() {
   try {
     setStatus("Checking for updates...", "info");
     const oldData = _guideCache[locale] || null;
-    _guideCache[locale] = null;
     const data = await fetchGuide(locale, true);
-    setStatus(oldData && oldData === data ? "Already up to date." : "Updated successfully!", "success");
+    if (!data.includes('|') || !data.includes(':')) {
+      setStatus("Invalid response from server.", "error");
+      return;
+    }
+    await updateFooter(locale, true);
+    if (oldData && oldData === data) {
+      setStatus("Already up to date.", "success");
+    } else {
+      resetGeneratedState();
+      setStatus("Updated successfully!", "success");
+    }
   } catch (err) {
-    setStatus(`Update failed: ${err.message}`, "error");
+    const b64 = locale === 'en' ? EMBEDDED_EN_B64 : EMBEDDED_DE_B64;
+    if (b64) {
+      setStatus("Offline — using embedded guide fallback.", "info");
+    } else {
+      setStatus(`Update failed: ${err.message}`, "error");
+    }
   }
 }
 
-function clearLocalSource() {
-  const locale = document.getElementById('language').value;
-  _localSourceText[locale] = null;
-  const zone = document.getElementById('localSourceDrop');
-  zone.classList.remove('has-file');
-  zone.querySelector('span').textContent = "Drop a local encrypted or plain guide .txt file here, or click to select";
-  resetGeneratedState();
-  setStatus(`Cleared local override for ${locale.toUpperCase()}.`, "info");
-}
-
+// === Tag History (localStorage) ===
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem('rxp_tags') || '[]'); }
-  catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem('rxp_tags') || '[]');
+  } catch { return []; }
 }
 
 function saveTagToHistory(tag) {
-  let h = getHistory().filter(t => t !== tag);
+  let h = getHistory();
+  h = h.filter(t => t !== tag);
   h.unshift(tag);
-  localStorage.setItem('rxp_tags', JSON.stringify(h.slice(0, 10)));
+  h = h.slice(0, 10);
+  localStorage.setItem('rxp_tags', JSON.stringify(h));
 }
 
 function loadLastTag() {
@@ -663,13 +840,15 @@ function loadLastTag() {
 
 function toggleHistory() {
   const list = document.getElementById('historyList');
+  const tags = getHistory();
+
   if (list.classList.contains('open')) {
     list.classList.remove('open');
     return;
   }
-  const tags = getHistory();
+
   list.innerHTML = '';
-  if (!tags.length) {
+  if (tags.length === 0) {
     list.innerHTML = '<div class="history-item" style="color:var(--muted)">No history</div>';
   } else {
     tags.forEach(tag => {
@@ -684,6 +863,7 @@ function toggleHistory() {
       list.appendChild(div);
     });
   }
+
   list.classList.add('open');
 }
 
@@ -693,6 +873,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// === UI helpers ===
 function setStatus(msg, type) {
   const el = document.getElementById('status');
   el.textContent = msg;
@@ -706,6 +887,11 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
+function scrollToTool() {
+  document.getElementById('toolSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+// === Sound ===
 let soundOn = localStorage.getItem('rxp_sound') !== 'off';
 function toggleSound() {
   soundOn = !soundOn;
@@ -731,28 +917,72 @@ function playDing() {
   } catch (e) {}
 }
 
-async function fetchLastUpdated(locale) {
+// === Last Updated (Cached GitHub commit date) ===
+function getCachedCommitDate(fname, allowStale = false) {
   try {
-    const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
-    const resp = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${fname}&per_page=1`);
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    return data.length ? new Date(data[0].commit.committer.date) : null;
-  } catch (e) { return null; }
+    const raw = localStorage.getItem(`rxp_commit_${fname}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.iso) return null;
+    const isFresh = (Date.now() - (parsed.fetchedAt || 0)) < COMMIT_CACHE_TTL_MS;
+    if (isFresh || allowStale) return new Date(parsed.iso);
+    return null;
+  } catch {
+    return null;
+  }
 }
 
-async function updateFooter() {
-  const locale = document.getElementById('language').value;
-  const date = await fetchLastUpdated(locale);
-  const base = 'v1.0 local | made by slcker';
-  if (date) {
+function setCachedCommitDate(fname, isoDate) {
+  try {
+    localStorage.setItem(`rxp_commit_${fname}`, JSON.stringify({
+      iso: isoDate,
+      fetchedAt: Date.now()
+    }));
+  } catch {}
+}
+
+async function fetchLastUpdated(locale, forceRefresh = false) {
+  const fname = guideFilename(locale);
+  if (!forceRefresh) {
+    const cached = getCachedCommitDate(fname, false);
+    if (cached) return cached;
+  }
+
+  try {
+    const resp = await fetch(
+      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${encodeURIComponent(fname)}&sha=${encodeURIComponent(BRANCH)}&per_page=1`
+    );
+    if (!resp.ok) return getCachedCommitDate(fname, true);
+    const data = await resp.json();
+    if (!Array.isArray(data) || data.length === 0) return getCachedCommitDate(fname, true);
+    const iso = data[0].commit.committer.date;
+    setCachedCommitDate(fname, iso);
+    return new Date(iso);
+  } catch (e) {
+    return getCachedCommitDate(fname, true);
+  }
+}
+
+function renderFooter(date) {
+  const base = 'v1.0 | made by slcker';
+  if (date && !Number.isNaN(date.getTime())) {
+    const opts = { year: 'numeric', month: 'short', day: 'numeric' };
+    const timeOpts = { hour: '2-digit', minute: '2-digit' };
     document.getElementById('footerInfo').textContent =
-      `${base} | Updated ${date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}, ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+      `${base} | Updated ${date.toLocaleDateString(undefined, opts)}, ${date.toLocaleTimeString(undefined, timeOpts)}`;
   } else {
     document.getElementById('footerInfo').textContent = base;
   }
 }
 
+async function updateFooter(localeOverride = null, forceRefresh = false) {
+  const locale = localeOverride || document.getElementById('language').value;
+  renderFooter(getCachedCommitDate(guideFilename(locale), true));
+  const date = await fetchLastUpdated(locale, forceRefresh);
+  renderFooter(date);
+}
+
+// === Dev Panel (hidden) ===
 let _footerClicks = 0;
 function footerClick() {
   _footerClicks++;
@@ -766,62 +996,62 @@ function footerClick() {
 let _devFileEN = null;
 let _devFileDE = null;
 
-function bindDropZone(zoneId, inputId, onFile) {
+function setupDropZone(zoneId, inputId, setter) {
   const zone = document.getElementById(zoneId);
   const input = document.getElementById(inputId);
+
   zone.addEventListener('click', () => input.click());
   input.addEventListener('change', (e) => {
-    if (e.target.files.length) onFile(e.target.files[0], zone);
+    if (e.target.files.length > 0) setter(e.target.files[0], zone);
   });
   zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
   zone.addEventListener('drop', (e) => {
     e.preventDefault();
     zone.classList.remove('dragover');
-    if (e.dataTransfer.files.length) onFile(e.dataTransfer.files[0], zone);
+    if (e.dataTransfer.files.length > 0) setter(e.dataTransfer.files[0], zone);
   });
 }
 
-bindDropZone('localSourceDrop', 'localSourceFile', async (file, zone) => {
-  const locale = document.getElementById('language').value;
-  _localSourceText[locale] = await file.text();
-  zone.textContent = `📄 ${locale.toUpperCase()} override: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-  zone.classList.add('has-file');
-  resetGeneratedState();
-  setStatus(`Loaded ${file.name} for ${locale.toUpperCase()}.`, "info");
-});
-
-bindDropZone('dropZoneEN', 'devFileEN', (file, zone) => {
+setupDropZone('dropZoneEN', 'devFileEN', (file, zone) => {
   _devFileEN = file;
-  zone.textContent = `📄 ${file.name}`;
+  zone.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   zone.classList.add('has-file');
 });
 
-bindDropZone('dropZoneDE', 'devFileDE', (file, zone) => {
+setupDropZone('dropZoneDE', 'devFileDE', (file, zone) => {
   _devFileDE = file;
-  zone.textContent = `📄 ${file.name}`;
+  zone.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   zone.classList.add('has-file');
 });
 
 async function pushGuides() {
   const token = document.getElementById('ghToken').value.trim();
+
   if (!token) { setDevStatus("Enter your GitHub token first.", "error"); return; }
   if (!_devFileEN && !_devFileDE) { setDevStatus("Drop at least one guide file.", "error"); return; }
+
   localStorage.setItem('rxp_gh_token', token);
   const results = [];
+
   try {
     if (_devFileEN) {
-      setDevStatus("Pushing guide.txt...", "info");
+      setDevStatus("Pushing English guide...", "info");
       await pushSingleFile(token, 'guide.txt', _devFileEN);
+      _guideCache['en'] = null;
       results.push('guide.txt');
     }
+
     if (_devFileDE) {
-      setDevStatus("Pushing guide_de.txt...", "info");
+      setDevStatus("Pushing German guide...", "info");
       await pushSingleFile(token, 'guide_de.txt', _devFileDE);
+      _guideCache['de'] = null;
       results.push('guide_de.txt');
     }
-    setDevStatus(`Pushed: ${results.join(', ')}`, "success");
-    showToast("Guide(s) pushed!");
+
+    await updateFooter(null, true);
+    setDevStatus(`✅ Pushed: ${results.join(', ')} — done!`, "success");
+    showToast("Guide(s) pushed to repo!");
   } catch (err) {
     setDevStatus(`Error: ${err.message}`, "error");
   }
@@ -829,31 +1059,41 @@ async function pushGuides() {
 
 async function pushSingleFile(token, fname, file) {
   const content = await file.text();
+
   let sha = '';
   const metaResp = await fetch(
-    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${fname}?ref=${BRANCH}`,
-    { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } }
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(fname)}?ref=${encodeURIComponent(BRANCH)}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json'
+      }
+    }
   );
   if (metaResp.ok) {
     const meta = await metaResp.json();
     sha = meta.sha;
   }
+
   const b64Content = bytesToB64(new TextEncoder().encode(content));
   const resp = await fetch(
-    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${fname}`,
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(fname)}`,
     {
       method: 'PUT',
       headers: {
-        'Authorization': `token ${token}`,
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         message: `Update ${fname} (${new Date().toISOString()})`,
+        branch: BRANCH,
         content: b64Content,
         ...(sha ? { sha } : {})
       })
     }
   );
+
   if (!resp.ok) {
     const err = await resp.json();
     throw new Error(`${fname}: ${err.message || 'HTTP ' + resp.status}`);
@@ -866,18 +1106,23 @@ function setDevStatus(msg, type) {
   el.className = 'status' + (type ? ` ${type}` : '');
 }
 
+// === Init ===
 loadLastTag();
 document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇';
 
 (async () => {
+  updateFooter();
   try {
     await loadPako();
-    await Promise.allSettled([fetchGuide('en'), fetchGuide('de')]);
+    await Promise.allSettled([
+      fetchGuide('en'),
+      fetchGuide('de')
+    ]);
     setStatus("Ready. Enter your BattleTag and click Generate.", "info");
   } catch (e) {
-    setStatus(`Load issue: ${e.message} — or drop a local .txt file above.`, "error");
+    console.warn("Auto-fetch on load failed:", e.message);
+    setStatus(`Load issue: ${e.message} — try "Check for Updates"`, "error");
   }
-  updateFooter();
 })();
 </script>
 </body>
