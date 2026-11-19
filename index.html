@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RXP Decryption Tool</title>
+<title>RXP Decryption Tool (Local)</title>
 <style>
   :root {
     --bg: #1e1e2e;
@@ -76,175 +76,7 @@
 
   .input-row { display: flex; gap: 8px; }
 
-  input[type="text"], input[type="password"], select {
-    background: var(--bg);
-    border: 1px solid var(--overlay);
-    border-radius: 8px;
-    padding: 11px 14px;
-    color: var(--text);
-    font-size: 0.95rem;
-    font-family: inherit;
-    width: 100%;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  input:focus, select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(137,180,250,0.15);
-  }
-
-  select {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a6adc8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 32px;
-  }
-
-  .btn-primary {
-    width: 100%;
-    padding: 13px;
-    background: linear-gradient(135deg, var(--accent), #7aa2f8);
-    color: var(--bg);
-    border: none;
-    border-radius: 8px;
-    font-size: 0.98rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.2s;
-    margin-top: 6px;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(137,180,250,0.3);
-  }
-
-  .btn-row { display: flex; gap: 8px; margin-top: 10px; }
-
-  .btn-secondary {
-    flex: 1;
-    padding: 10px;
-    background: var(--overlay);
-    color: var(--text);
-    border: none;
-    border-radius: 8px;
-    font-size: 0.84rem;
-    cursor: pointer;
-  }
-
-  .btn-secondary:hover { background: #565a72; }
-
-  .result-area { margin-top: 16px; }
-
-  .result-area textarea {
-    width: 100%;
-    background: var(--bg);
-    color: var(--text);
-    border: 1px solid var(--overlay);
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 0.75rem;
-    font-family: 'Consolas', monospace;
-    resize: vertical;
-  }
-
-  .stats-card {
-    background: var(--bg);
-    border: 1px solid var(--overlay);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    font-size: 0.82rem;
-    line-height: 1.7;
-  }
-
-  .stat-row { display: flex; justify-content: space-between; }
-  .stat-label { color: var(--muted); }
-  .stat-value { color: var(--text); font-weight: 600; font-family: 'Consolas', monospace; }
-
-  .drop-zone {
-    border: 2px dashed var(--overlay);<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RXP Decryption Tool</title>
-<style>
-  :root {
-    --bg: #1e1e2e;
-    --surface: #313244;
-    --overlay: #45475a;
-    --text: #cdd6f4;
-    --subtext: #a6adc8;
-    --accent: #89b4fa;
-    --green: #a6e3a1;
-    --red: #f38ba8;
-    --yellow: #f9e2af;
-    --muted: #6c7086;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    min-height: 100vh;
-    padding: 24px 20px 48px;
-  }
-
-  .container {
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 36px;
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(137,180,250,0.1);
-    position: relative;
-  }
-
-  .container::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    border-radius: 16px 16px 0 0;
-    background: linear-gradient(90deg, var(--accent), #b4befe, var(--accent));
-    opacity: 0.75;
-  }
-
-  .logo { text-align: center; margin-bottom: 24px; }
-
-  .logo h1 {
-    font-size: 1.55rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), #b4befe);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .logo p { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
-
-  .field-group { margin-bottom: 16px; }
-
-  .field-group label {
-    display: block;
-    font-size: 0.78rem;
-    color: var(--subtext);
-    margin-bottom: 6px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .input-row { display: flex; gap: 8px; }
-
-  input[type="text"], input[type="password"], select {
+  input[type="text"], select {
     background: var(--bg);
     border: 1px solid var(--overlay);
     border-radius: 8px;
@@ -368,8 +200,6 @@
     margin-top: 18px;
     font-size: 0.75rem;
     color: var(--muted);
-    cursor: pointer;
-    user-select: none;
   }
 
   .history-dropdown { position: relative; }
@@ -440,8 +270,8 @@
   <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">🔊</button>
 
   <div class="logo">
-    <h1>Generate Your Guide</h1>
-    <p>Paste into RXPGuides to unlock</p>
+    <h1>RXP Guide Generator</h1>
+    <p>Local guide file &amp; BattleTag key generator</p>
   </div>
 
   <div class="field-group">
@@ -457,16 +287,16 @@
 
   <div class="field-group">
     <label for="language">Language</label>
-    <select id="language" onchange="updateFooter()">
+    <select id="language">
       <option value="en">English</option>
       <option value="de">German (Deutsch)</option>
     </select>
   </div>
 
   <div class="field-group">
-    <label>Local Guide File Fallback (Optional)</label>
+    <label>Local Guide File (.txt)</label>
     <div class="drop-zone" id="localGuideDrop">
-      <span>Drop a local encrypted or plain guide .txt file here, or click to select</span>
+      <span>Drop your guide .txt file here (encrypted or plain), or click to choose</span>
       <input type="file" id="localGuideFile" accept=".txt" hidden>
     </div>
   </div>
@@ -474,8 +304,7 @@
   <button class="btn-primary" id="mainBtn" type="button" onclick="generateGuide()">Generate Guide</button>
 
   <div class="btn-row">
-    <button class="btn-secondary" type="button" onclick="checkUpdate()">Check for Updates</button>
-    <button class="btn-secondary" type="button" onclick="clearLocalGuide()">Clear Local File</button>
+    <button class="btn-secondary" type="button" onclick="clearLocalGuide()">Clear Loaded File</button>
   </div>
 
   <div class="result-area" id="resultArea" style="display:none;">
@@ -483,9 +312,9 @@
     <textarea id="guideOutput" readonly rows="4"></textarea>
   </div>
 
-  <div class="status" id="status">Enter your BattleTag and click Generate</div>
+  <div class="status" id="status">Drop your guide .txt file, enter your BattleTag, and click Generate.</div>
 
-  <div class="footer" id="footerInfo" onclick="updateFooter()">v1.0 | made by slcker</div>
+  <div class="footer" id="footerInfo">v1.0 local | made by slcker</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -497,8 +326,9 @@ const REPO_OWNER = "Inariaa";
 const REPO_NAME = "rxp_decrypter";
 const BRANCH = "main";
 
-let EMBEDDED_EN_B64 = "";
-let EMBEDDED_DE_B64 = "";
+// Optional: paste base64 zlib-compressed guide text here if you want hardcoded local data
+const EMBEDDED_EN_B64 = "";
+const EMBEDDED_DE_B64 = "";
 
 let _guideCache = {};
 let _localGuideText = { en: null, de: null };
@@ -564,19 +394,19 @@ function loadPako() {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
     script.onload = resolve;
-    script.onerror = () => reject(new Error("Failed to load pako library from CDN"));
+    script.onerror = () => reject(new Error("Failed to load pako library"));
     document.head.appendChild(script);
   });
 }
 
-async function fetchGuide(locale, forceRefresh = false) {
-  if (_guideCache[locale] && !forceRefresh) return _guideCache[locale];
+async function fetchGuide(locale) {
+  if (_guideCache[locale]) return _guideCache[locale];
   const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
   const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${fname}`;
   const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`GitHub raw fetch failed for ${fname} (HTTP ${resp.status})`);
+  if (!resp.ok) throw new Error(`Remote fetch failed (HTTP ${resp.status})`);
   const data = await resp.text();
-  if (!data.trim()) throw new Error(`Empty response for ${fname}`);
+  if (!data.trim()) throw new Error("Remote guide file is empty");
   _guideCache[locale] = data;
   return data;
 }
@@ -587,10 +417,9 @@ function isEncryptedGuideString(rawText) {
 
 function parseEncrypted(data, originalTag) {
   if (typeof pako === 'undefined') throw new Error("pako is not loaded yet");
-  const trimmed = data.trim();
-  const m = trimmed.match(/^(\d+)\|(\d+):([A-Za-z0-9+/=]+)%/);
+  const m = data.trim().match(/^(\d+)\|(\d+):([A-Za-z0-9+/=]+)%/);
   if (!m) {
-    throw new Error("Guide string does not match expected '<count>|<check>:<base64>%' format");
+    throw new Error("Guide string does not match '<count>|<check>:<base64>%' format");
   }
   const cipherBytes = b64ToBytes(m[3]);
   const key = deriveKey(originalTag);
@@ -607,39 +436,31 @@ async function decodeSourceText(rawText) {
   if (/^#name\b/m.test(normalized) || normalized.includes('RXPGuides')) {
     return normalized;
   }
-  throw new Error("Guide source is neither a valid '<count>|<check>:<base64>%' encrypted string nor plain RXP guide text.");
+  throw new Error("File is neither a valid encrypted guide string nor plain RXP guide text.");
 }
 
 async function getPlainText(locale) {
   await loadPako();
-  const reasons = [];
 
+  // 1. Prefer locally dropped guide data first
   if (_localGuideText[locale]) {
-    try {
-      return await decodeSourceText(_localGuideText[locale]);
-    } catch (e) {
-      reasons.push(`Local file: ${e.message}`);
-    }
+    return decodeSourceText(_localGuideText[locale]);
   }
 
-  try {
-    const data = await fetchGuide(locale);
-    return await decodeSourceText(data);
-  } catch (e) {
-    reasons.push(e.message || String(e));
-  }
-
+  // 2. Check embedded base64 fallback if configured
   const b64 = locale === 'en' ? EMBEDDED_EN_B64 : EMBEDDED_DE_B64;
   if (b64) {
-    try {
-      const bytes = b64ToBytes(b64);
-      return new TextDecoder().decode(new Uint8Array(pako.inflate(bytes)));
-    } catch (e) {
-      reasons.push(`Embedded fallback: ${e.message}`);
-    }
+    const bytes = b64ToBytes(b64);
+    return new TextDecoder().decode(new Uint8Array(pako.inflate(bytes)));
   }
 
-  throw new Error(`${reasons.join(' | ')} — or drop a local guide .txt file above.`);
+  // 3. Fall back to GitHub if no local or embedded data was supplied
+  try {
+    const data = await fetchGuide(locale);
+    return decodeSourceText(data);
+  } catch (err) {
+    throw new Error("No local guide file loaded and remote fetch failed. Drop your guide .txt file above.");
+  }
 }
 
 async function generateGuide() {
@@ -694,7 +515,7 @@ async function generateGuide() {
     document.getElementById('resultArea').style.display = 'block';
     _guideGenerated = true;
     document.getElementById('mainBtn').textContent = "Copy to Clipboard";
-    setStatus(`Generated ${guideCount} guides. Click button again to copy.`, "success");
+    setStatus(`Generated ${guideCount} guides. Click again to copy.`, "success");
   } catch (err) {
     setStatus(`Error: ${err.message}`, "error");
   }
@@ -709,59 +530,38 @@ function resetGeneratedState() {
 document.getElementById('battletag').addEventListener('input', resetGeneratedState);
 document.getElementById('language').addEventListener('change', resetGeneratedState);
 
-async function checkUpdate() {
-  const locale = document.getElementById('language').value;
-  try {
-    setStatus("Checking for updates...", "info");
-    await loadPako();
-    const oldData = _guideCache[locale] || null;
-    _guideCache[locale] = null;
-    const data = await fetchGuide(locale, true);
-    await decodeSourceText(data);
-    setStatus(oldData && oldData === data ? "Already up to date." : "Updated successfully!", "success");
-  } catch (err) {
-    setStatus(`Update failed: ${err.message}`, "error");
-  }
-}
-
 function clearLocalGuide() {
   const locale = document.getElementById('language').value;
   _localGuideText[locale] = null;
   const zone = document.getElementById('localGuideDrop');
   zone.classList.remove('has-file');
-  zone.querySelector('span').textContent = "Drop a local encrypted or plain guide .txt file here, or click to select";
+  zone.querySelector('span').textContent = "Drop your guide .txt file here (encrypted or plain), or click to choose";
   resetGeneratedState();
   setStatus(`Cleared local file for ${locale.toUpperCase()}.`, "info");
+}
+
+async function handleLocalFile(file) {
+  const locale = document.getElementById('language').value;
+  _localGuideText[locale] = await file.text();
+  const zone = document.getElementById('localGuideDrop');
+  zone.classList.add('has-file');
+  zone.querySelector('span').textContent = `📄 ${file.name} (${locale.toUpperCase()})`;
+  resetGeneratedState();
+  setStatus(`Loaded ${file.name} for ${locale.toUpperCase()}.`, "info");
 }
 
 const dropZone = document.getElementById('localGuideDrop');
 const fileInput = document.getElementById('localGuideFile');
 dropZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', async (e) => {
-  if (e.target.files.length) {
-    const file = e.target.files[0];
-    const locale = document.getElementById('language').value;
-    _localGuideText[locale] = await file.text();
-    dropZone.classList.add('has-file');
-    dropZone.querySelector('span').textContent = `📄 ${file.name} loaded for ${locale.toUpperCase()}`;
-    resetGeneratedState();
-    setStatus(`Loaded local file ${file.name}. Click Generate Guide.`, "info");
-  }
+  if (e.target.files.length) await handleLocalFile(e.target.files[0]);
 });
 dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 dropZone.addEventListener('drop', async (e) => {
   e.preventDefault();
   dropZone.classList.remove('dragover');
-  if (e.dataTransfer.files.length) {
-    const file = e.dataTransfer.files[0];
-    const locale = document.getElementById('language').value;
-    _localGuideText[locale] = await file.text();
-    dropZone.classList.add('has-file');
-    dropZone.querySelector('span').textContent = `📄 ${file.name} loaded for ${locale.toUpperCase()}`;
-    resetGeneratedState();
-    setStatus(`Loaded local file ${file.name}. Click Generate Guide.`, "info");
-  }
+  if (e.dataTransfer.files.length) await handleLocalFile(e.dataTransfer.files[0]);
 });
 
 function getHistory() {
@@ -850,41 +650,9 @@ function playDing() {
   } catch (e) {}
 }
 
-async function fetchLastUpdated(locale) {
-  try {
-    const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
-    const resp = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${fname}&per_page=1`);
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    return data.length ? new Date(data[0].commit.committer.date) : null;
-  } catch (e) { return null; }
-}
-
-async function updateFooter() {
-  const locale = document.getElementById('language').value;
-  const date = await fetchLastUpdated(locale);
-  const base = 'v1.0 | made by slcker';
-  if (date) {
-    document.getElementById('footerInfo').textContent =
-      `${base} | Updated ${date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}, ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
-  } else {
-    document.getElementById('footerInfo').textContent = base;
-  }
-}
-
 loadLastTag();
 document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇';
-
-(async () => {
-  try {
-    await loadPako();
-    await Promise.allSettled([fetchGuide('en'), fetchGuide('de')]);
-    setStatus("Ready. Enter your BattleTag and click Generate.", "info");
-  } catch (e) {
-    setStatus(`Load issue: ${e.message} — or drop a local .txt file above.`, "error");
-  }
-  updateFooter();
-})();
+loadPako().catch(() => {});
 </script>
 </body>
 </html>
