@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RXP Decryption Tool (Online)</title>
+<title>RXP Decryption Tool</title>
 <style>
   :root {
     --bg: #1e1e2e;
@@ -49,10 +49,7 @@
     opacity: 0.75;
   }
 
-  .logo {
-    text-align: center;
-    margin-bottom: 24px;
-  }
+  .logo { text-align: center; margin-bottom: 24px; }
 
   .logo h1 {
     font-size: 1.55rem;
@@ -63,11 +60,7 @@
     background-clip: text;
   }
 
-  .logo p {
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin-top: 6px;
-  }
+  .logo p { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
 
   .field-group { margin-bottom: 16px; }
 
@@ -140,7 +133,6 @@
     border-radius: 8px;
     font-size: 0.84rem;
     cursor: pointer;
-    transition: background 0.2s;
   }
 
   .btn-secondary:hover { background: #565a72; }
@@ -173,12 +165,550 @@
   .stat-label { color: var(--muted); }
   .stat-value { color: var(--text); font-weight: 600; font-family: 'Consolas', monospace; }
 
+  .drop-zone {
+    border: 2px dashed var(--overlay);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.82rem;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(137,180,250,0.05);
+  }
+
+  .drop-zone.has-file { border-color: var(--green); color: var(--green); }
+
   .status {
     text-align: center;
     font-size: 0.82rem;
     color: var(--muted);
     margin-top: 14px;
     min-height: 1.2em;
+    word-break: break-word;
   }
 
-  .status.success { color:
+  .status.success { color: var(--green); }
+  .status.error { color: var(--red); }
+  .status.info { color: var(--accent); }
+
+  .footer {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .history-dropdown { position: relative; }
+
+  .btn-history {
+    background: var(--overlay);
+    border: none;
+    color: var(--text);
+    padding: 11px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .history-list {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 180px;
+    background: var(--surface);
+    border: 1px solid var(--overlay);
+    border-radius: 8px;
+    margin-top: 4px;
+    z-index: 10;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .history-list.open { display: block; }
+  .history-item { padding: 9px 14px; cursor: pointer; font-size: 0.85rem; }
+  .history-item:hover { background: var(--overlay); }
+
+  .sound-toggle {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.6;
+  }
+
+  .sound-toggle:hover { opacity: 1; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: var(--bg);
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    opacity: 0;
+    transition: transform 0.25s, opacity 0.25s;
+    z-index: 100;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">🔊</button>
+
+  <div class="logo">
+    <h1>Generate Your Guide</h1>
+    <p>Paste into RXPGuides to unlock</p>
+  </div>
+
+  <div class="field-group">
+    <label for="battletag">Your BattleTag</label>
+    <div class="input-row">
+      <input type="text" id="battletag" placeholder="Name#1234" autocomplete="off" spellcheck="false">
+      <div class="history-dropdown">
+        <button class="btn-history" type="button" onclick="toggleHistory()">🕐</button>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label for="language">Language</label>
+    <select id="language" onchange="updateFooter()">
+      <option value="en">English</option>
+      <option value="de">German (Deutsch)</option>
+    </select>
+  </div>
+
+  <div class="field-group">
+    <label>Local Guide File Fallback (Optional)</label>
+    <div class="drop-zone" id="localGuideDrop">
+      <span>Drop a local encrypted or plain guide .txt file here, or click to select</span>
+      <input type="file" id="localGuideFile" accept=".txt" hidden>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="mainBtn" type="button" onclick="generateGuide()">Generate Guide</button>
+
+  <div class="btn-row">
+    <button class="btn-secondary" type="button" onclick="checkUpdate()">Check for Updates</button>
+    <button class="btn-secondary" type="button" onclick="clearLocalGuide()">Clear Local File</button>
+  </div>
+
+  <div class="result-area" id="resultArea" style="display:none;">
+    <div class="stats-card" id="statsCard"></div>
+    <textarea id="guideOutput" readonly rows="4"></textarea>
+  </div>
+
+  <div class="status" id="status">Enter your BattleTag and click Generate</div>
+
+  <div class="footer" id="footerInfo" onclick="updateFooter()">v1.0 | made by slcker</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const _cfg = [95, 86, 95, 86, 20, 1, 0, 1, 0];
+const ORIGINAL_TAG = _cfg.map(v => String.fromCharCode(v ^ 0x37)).join('');
+const REPO_OWNER = "Inariaa";
+const REPO_NAME = "rxp_decrypter";
+const BRANCH = "main";
+
+let EMBEDDED_EN_B64 = "";
+let EMBEDDED_DE_B64 = "";
+
+let _guideCache = {};
+let _localGuideText = { en: null, de: null };
+let _guideGenerated = false;
+
+function rc4(data, key) {
+  const S = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) S[i] = i;
+  let j = 0;
+  for (let i = 0; i < 256; i++) {
+    j = (j + S[i] + key[i & 0xF]) & 0xFF;
+    [S[i], S[j]] = [S[j], S[i]];
+  }
+  const out = new Uint8Array(data.length);
+  let i = 0, k = 0;
+  for (let n = 0; n < data.length; n++) {
+    i = (i + 1) & 0xFF;
+    k = (k + S[i]) & 0xFF;
+    [S[i], S[k]] = [S[k], S[i]];
+    out[n] = data[n] ^ S[(S[i] + S[k]) & 0xFF];
+  }
+  return out;
+}
+
+function asciiLower(s) {
+  return s.replace(/[A-Z]/g, c => String.fromCharCode(c.charCodeAt(0) + 32));
+}
+
+function deriveKey(baseStr) {
+  const raw = new TextEncoder().encode(asciiLower(baseStr));
+  const buf = new Uint8Array(16);
+  const len = Math.min(raw.length, 16);
+  const offset = 16 - len;
+  for (let i = 0; i < len; i++) {
+    buf[offset + i] = raw[raw.length - len + i];
+  }
+  for (let i = 0; i < 16; i++) {
+    const idx = ((-i) & 0xF);
+    buf[idx] = buf[(15 - i) & 0xF] ^ buf[(13 - i) & 0xF] ^ buf[(12 - i) & 0xF] ^ buf[(10 - i) & 0xF];
+  }
+  return buf;
+}
+
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+function bytesToB64(bytes) {
+  let binary = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+function loadPako() {
+  return new Promise((resolve, reject) => {
+    if (typeof pako !== 'undefined') { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Failed to load pako library from CDN"));
+    document.head.appendChild(script);
+  });
+}
+
+async function fetchGuide(locale, forceRefresh = false) {
+  if (_guideCache[locale] && !forceRefresh) return _guideCache[locale];
+  const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
+  const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${fname}`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`GitHub raw fetch failed for ${fname} (HTTP ${resp.status})`);
+  const data = await resp.text();
+  if (!data.includes('|')) throw new Error(`Invalid guide format in ${fname} (missing '|')`);
+  _guideCache[locale] = data;
+  return data;
+}
+
+function parseEncrypted(data, originalTag) {
+  if (typeof pako === 'undefined') throw new Error("pako is not loaded yet");
+  const m = data.match(/^(\d+)\|(\d+):([A-Za-z0-9+/=]+)%/);
+  if (!m) throw new Error("Guide string does not match expected '<count>|<check>:<base64>%' format");
+  const cipherBytes = b64ToBytes(m[3]);
+  const key = deriveKey(originalTag);
+  const decrypted = rc4(cipherBytes, key);
+  const textBytes = new Uint8Array(pako.inflate(decrypted));
+  return new TextDecoder().decode(textBytes);
+}
+
+async function decodeSourceText(rawText) {
+  if (rawText.includes('|') && rawText.includes(':')) {
+    return parseEncrypted(rawText, ORIGINAL_TAG);
+  }
+  return rawText;
+}
+
+async function getPlainText(locale) {
+  await loadPako();
+  const reasons = [];
+
+  if (_localGuideText[locale]) {
+    try {
+      return await decodeSourceText(_localGuideText[locale]);
+    } catch (e) {
+      reasons.push(`Local file: ${e.message}`);
+    }
+  }
+
+  try {
+    const data = await fetchGuide(locale);
+    return await decodeSourceText(data);
+  } catch (e) {
+    reasons.push(e.message || String(e));
+  }
+
+  const b64 = locale === 'en' ? EMBEDDED_EN_B64 : EMBEDDED_DE_B64;
+  if (b64) {
+    try {
+      const bytes = b64ToBytes(b64);
+      return new TextDecoder().decode(new Uint8Array(pako.inflate(bytes)));
+    } catch (e) {
+      reasons.push(`Embedded fallback: ${e.message}`);
+    }
+  }
+
+  throw new Error(`${reasons.join(' | ')} — or drop a local guide .txt file above.`);
+}
+
+async function generateGuide() {
+  if (_guideGenerated) {
+    await navigator.clipboard.writeText(document.getElementById('guideOutput').value);
+    setStatus("Copied! Paste into RXPGuides.", "success");
+    showToast("Copied to clipboard!");
+    return;
+  }
+
+  const tag = document.getElementById('battletag').value.trim();
+  if (!tag) {
+    setStatus("Please enter your BattleTag first.", "error");
+    return;
+  }
+  if (!/^[^#]+#\d+$/.test(tag)) {
+    setStatus("Invalid format. Use: Name#1234", "error");
+    return;
+  }
+
+  const locale = document.getElementById('language').value;
+
+  try {
+    setStatus("Generating...", "info");
+    const text = await getPlainText(locale);
+    const keyNew = deriveKey(tag);
+    const zlibData = new Uint8Array(pako.deflate(new TextEncoder().encode(text), { level: 6 }));
+    const cipher = rc4(zlibData, keyNew);
+    const b64Out = bytesToB64(cipher);
+
+    const checkVal = (
+      (zlibData[zlibData.length - 4] << 24) |
+      (zlibData[zlibData.length - 3] << 16) |
+      (zlibData[zlibData.length - 2] << 8) |
+      zlibData[zlibData.length - 1]
+    ) >>> 0;
+
+    const guideCount = (text.match(/^#name/gm) || []).length;
+    const content = `${guideCount}|${checkVal}:${b64Out}%|40000`;
+
+    saveTagToHistory(tag);
+    playDing();
+
+    document.getElementById('guideOutput').value = content;
+    const sizeMB = (new Blob([content]).size / (1024 * 1024)).toFixed(2);
+    document.getElementById('statsCard').innerHTML = `
+      <div class="stat-row"><span class="stat-label">BattleTag</span><span class="stat-value">${tag}</span></div>
+      <div class="stat-row"><span class="stat-label">Guides</span><span class="stat-value">${guideCount}</span></div>
+      <div class="stat-row"><span class="stat-label">Size</span><span class="stat-value">${sizeMB} MB</span></div>
+    `;
+
+    document.getElementById('resultArea').style.display = 'block';
+    _guideGenerated = true;
+    document.getElementById('mainBtn').textContent = "Copy to Clipboard";
+    setStatus(`Generated ${guideCount} guides. Click button again to copy.`, "success");
+  } catch (err) {
+    setStatus(`Error: ${err.message}`, "error");
+  }
+}
+
+function resetGeneratedState() {
+  _guideGenerated = false;
+  document.getElementById('mainBtn').textContent = 'Generate Guide';
+  document.getElementById('resultArea').style.display = 'none';
+}
+
+document.getElementById('battletag').addEventListener('input', resetGeneratedState);
+document.getElementById('language').addEventListener('change', resetGeneratedState);
+
+async function checkUpdate() {
+  const locale = document.getElementById('language').value;
+  try {
+    setStatus("Checking for updates...", "info");
+    await loadPako();
+    const oldData = _guideCache[locale] || null;
+    _guideCache[locale] = null;
+    const data = await fetchGuide(locale, true);
+    if (!data.includes('|') || !data.includes(':')) {
+      setStatus("Invalid response from server.", "error");
+      return;
+    }
+    setStatus(oldData && oldData === data ? "Already up to date." : "Updated successfully!", "success");
+  } catch (err) {
+    setStatus(`Update failed: ${err.message}`, "error");
+  }
+}
+
+function clearLocalGuide() {
+  const locale = document.getElementById('language').value;
+  _localGuideText[locale] = null;
+  const zone = document.getElementById('localGuideDrop');
+  zone.classList.remove('has-file');
+  zone.querySelector('span').textContent = "Drop a local encrypted or plain guide .txt file here, or click to select";
+  resetGeneratedState();
+  setStatus(`Cleared local file for ${locale.toUpperCase()}.`, "info");
+}
+
+const dropZone = document.getElementById('localGuideDrop');
+const fileInput = document.getElementById('localGuideFile');
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', async (e) => {
+  if (e.target.files.length) {
+    const file = e.target.files[0];
+    const locale = document.getElementById('language').value;
+    _localGuideText[locale] = await file.text();
+    dropZone.classList.add('has-file');
+    dropZone.querySelector('span').textContent = `📄 ${file.name} loaded for ${locale.toUpperCase()}`;
+    resetGeneratedState();
+    setStatus(`Loaded local file ${file.name}. Click Generate Guide.`, "info");
+  }
+});
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length) {
+    const file = e.dataTransfer.files[0];
+    const locale = document.getElementById('language').value;
+    _localGuideText[locale] = await file.text();
+    dropZone.classList.add('has-file');
+    dropZone.querySelector('span').textContent = `📄 ${file.name} loaded for ${locale.toUpperCase()}`;
+    resetGeneratedState();
+    setStatus(`Loaded local file ${file.name}. Click Generate Guide.`, "info");
+  }
+});
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('rxp_tags') || '[]'); }
+  catch { return []; }
+}
+
+function saveTagToHistory(tag) {
+  let h = getHistory().filter(t => t !== tag);
+  h.unshift(tag);
+  localStorage.setItem('rxp_tags', JSON.stringify(h.slice(0, 10)));
+}
+
+function loadLastTag() {
+  const h = getHistory();
+  if (h.length > 0) document.getElementById('battletag').value = h[0];
+}
+
+function toggleHistory() {
+  const list = document.getElementById('historyList');
+  if (list.classList.contains('open')) {
+    list.classList.remove('open');
+    return;
+  }
+  const tags = getHistory();
+  list.innerHTML = '';
+  if (!tags.length) {
+    list.innerHTML = '<div class="history-item" style="color:var(--muted)">No history</div>';
+  } else {
+    tags.forEach(tag => {
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.textContent = tag;
+      div.onclick = () => {
+        document.getElementById('battletag').value = tag;
+        resetGeneratedState();
+        list.classList.remove('open');
+      };
+      list.appendChild(div);
+    });
+  }
+  list.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.history-dropdown')) {
+    document.getElementById('historyList').classList.remove('open');
+  }
+});
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (type ? ` ${type}` : '');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+let soundOn = localStorage.getItem('rxp_sound') !== 'off';
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem('rxp_sound', soundOn ? 'on' : 'off');
+  document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇';
+}
+
+function playDing() {
+  if (!soundOn) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.3);
+  } catch (e) {}
+}
+
+async function fetchLastUpdated(locale) {
+  try {
+    const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
+    const resp = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${fname}&per_page=1`);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data.length ? new Date(data[0].commit.committer.date) : null;
+  } catch (e) { return null; }
+}
+
+async function updateFooter() {
+  const locale = document.getElementById('language').value;
+  const date = await fetchLastUpdated(locale);
+  const base = 'v1.0 | made by slcker';
+  if (date) {
+    document.getElementById('footerInfo').textContent =
+      `${base} | Updated ${date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}, ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  } else {
+    document.getElementById('footerInfo').textContent = base;
+  }
+}
+
+loadLastTag();
+document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇';
+
+(async () => {
+  try {
+    await loadPako();
+    await Promise.allSettled([fetchGuide('en'), fetchGuide('de')]);
+    setStatus("Ready. Enter your BattleTag and click Generate.", "info");
+  } catch (e) {
+    setStatus(`Load issue: ${e.message} — or drop a local .txt file above.`, "error");
+  }
+  updateFooter();
+})();
+</script>
+</body>
+</html>
