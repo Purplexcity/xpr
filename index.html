@@ -12,6 +12,7 @@
     --text: #cdd6f4;
     --subtext: #a6adc8;
     --accent: #89b4fa;
+    --accent-hover: #74a0f5;
     --green: #a6e3a1;
     --red: #f38ba8;
     --yellow: #f9e2af;
@@ -49,7 +50,10 @@
     opacity: 0.75;
   }
 
-  .logo { text-align: center; margin-bottom: 24px; }
+  .logo {
+    text-align: center;
+    margin-bottom: 24px;
+  }
 
   .logo h1 {
     font-size: 1.55rem;
@@ -60,9 +64,15 @@
     background-clip: text;
   }
 
-  .logo p { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+  .logo p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 6px;
+  }
 
-  .field-group { margin-bottom: 16px; }
+  .field-group {
+    margin-bottom: 16px;
+  }
 
   .field-group label {
     display: block;
@@ -74,9 +84,12 @@
     letter-spacing: 0.5px;
   }
 
-  .input-row { display: flex; gap: 8px; }
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
 
-  input[type="text"], select {
+  input[type="text"], input[type="password"], select {
     background: var(--bg);
     border: 1px solid var(--overlay);
     border-radius: 8px;
@@ -122,7 +135,11 @@
     box-shadow: 0 6px 20px rgba(137,180,250,0.3);
   }
 
-  .btn-row { display: flex; gap: 8px; margin-top: 10px; }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
 
   .btn-secondary {
     flex: 1;
@@ -133,11 +150,22 @@
     border-radius: 8px;
     font-size: 0.84rem;
     cursor: pointer;
+    transition: background 0.2s;
   }
 
-  .btn-secondary:hover { background: #565a72; }
+  .btn-secondary:hover {
+    background: #565a72;
+  }
 
-  .result-area { margin-top: 16px; }
+  .result-area {
+    margin-top: 16px;
+    animation: fadeIn 0.25s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   .result-area textarea {
     width: 100%;
@@ -161,26 +189,13 @@
     line-height: 1.7;
   }
 
-  .stat-row { display: flex; justify-content: space-between; }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .stat-label { color: var(--muted); }
   .stat-value { color: var(--text); font-weight: 600; font-family: 'Consolas', monospace; }
-
-  .drop-zone {
-    border: 2px dashed var(--overlay);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 0.82rem;
-  }
-
-  .drop-zone:hover, .drop-zone.dragover {
-    border-color: var(--accent);
-    background: rgba(137,180,250,0.05);
-  }
-
-  .drop-zone.has-file { border-color: var(--green); color: var(--green); }
 
   .status {
     text-align: center;
@@ -188,7 +203,6 @@
     color: var(--muted);
     margin-top: 14px;
     min-height: 1.2em;
-    word-break: break-word;
   }
 
   .status.success { color: var(--green); }
@@ -200,9 +214,13 @@
     margin-top: 18px;
     font-size: 0.75rem;
     color: var(--muted);
+    cursor: pointer;
+    user-select: none;
   }
 
-  .history-dropdown { position: relative; }
+  .history-dropdown {
+    position: relative;
+  }
 
   .btn-history {
     background: var(--overlay);
@@ -213,6 +231,8 @@
     cursor: pointer;
     font-size: 0.9rem;
   }
+
+  .btn-history:hover { background: #565a72; }
 
   .history-list {
     position: absolute;
@@ -229,8 +249,64 @@
   }
 
   .history-list.open { display: block; }
-  .history-item { padding: 9px 14px; cursor: pointer; font-size: 0.85rem; }
+
+  .history-item {
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
   .history-item:hover { background: var(--overlay); }
+
+  .dev-panel {
+    display: none;
+    margin-top: 20px;
+    padding: 18px;
+    background: var(--bg);
+    border: 1px solid var(--overlay);
+    border-radius: 12px;
+  }
+
+  .dev-panel h3 {
+    font-size: 0.9rem;
+    color: var(--yellow);
+    margin-bottom: 14px;
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--overlay);
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-size: 0.82rem;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(137,180,250,0.05);
+  }
+
+  .drop-zone.has-file {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .dev-files {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .dev-file-slot { flex: 1; }
+  .dev-file-slot label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--subtext);
+    margin-bottom: 5px;
+  }
 
   .sound-toggle {
     position: absolute;
@@ -261,21 +337,24 @@
     z-index: 100;
   }
 
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="toolSection">
   <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">🔊</button>
 
   <div class="logo">
     <h1>RXP Guide Generator</h1>
-    <p>Local guide file &amp; BattleTag key generator</p>
+    <p>Local client-side key derivation &amp; re-encryption</p>
   </div>
 
   <div class="field-group">
-    <label for="battletag">Your BattleTag</label>
+    <label for="battletag">BattleTag</label>
     <div class="input-row">
       <input type="text" id="battletag" placeholder="Name#1234" autocomplete="off" spellcheck="false">
       <div class="history-dropdown">
@@ -287,24 +366,25 @@
 
   <div class="field-group">
     <label for="language">Language</label>
-    <select id="language">
-      <option value="en">English</option>
-      <option value="de">German (Deutsch)</option>
+    <select id="language" onchange="updateFooter()">
+      <option value="en">English (guide.txt)</option>
+      <option value="de">German / Deutsch (guide_de.txt)</option>
     </select>
   </div>
 
   <div class="field-group">
-    <label>Local Guide File (.txt)</label>
-    <div class="drop-zone" id="localGuideDrop">
-      <span>Drop your guide .txt file here (encrypted or plain), or click to choose</span>
-      <input type="file" id="localGuideFile" accept=".txt" hidden>
+    <label>Local Source Override (Optional)</label>
+    <div class="drop-zone" id="localSourceDrop">
+      <span>Drop a local encrypted or plain guide .txt file here, or click to select</span>
+      <input type="file" id="localSourceFile" accept=".txt" hidden>
     </div>
   </div>
 
   <button class="btn-primary" id="mainBtn" type="button" onclick="generateGuide()">Generate Guide</button>
 
   <div class="btn-row">
-    <button class="btn-secondary" type="button" onclick="clearLocalGuide()">Clear Loaded File</button>
+    <button class="btn-secondary" type="button" onclick="checkUpdate()">Check for Updates</button>
+    <button class="btn-secondary" type="button" onclick="clearLocalSource()">Clear Local File</button>
   </div>
 
   <div class="result-area" id="resultArea" style="display:none;">
@@ -312,9 +392,35 @@
     <textarea id="guideOutput" readonly rows="4"></textarea>
   </div>
 
-  <div class="status" id="status">Drop your guide .txt file, enter your BattleTag, and click Generate.</div>
+  <div class="status" id="status">Ready.</div>
 
-  <div class="footer" id="footerInfo">v1.0 local | made by slcker</div>
+  <div class="footer" id="footerInfo" onclick="footerClick()">v1.0 local | made by slcker</div>
+
+  <div class="dev-panel" id="devPanel">
+    <h3>⚙️ Owner Panel (GitHub Push)</h3>
+    <div class="field-group">
+      <label for="ghToken">GitHub Token</label>
+      <input type="password" id="ghToken" placeholder="ghp_xxxx... or github_pat_...">
+    </div>
+    <div class="dev-files">
+      <div class="dev-file-slot">
+        <label>English (guide.txt)</label>
+        <div class="drop-zone" id="dropZoneEN">
+          <span>Drop EN guide</span>
+          <input type="file" id="devFileEN" accept=".txt" hidden>
+        </div>
+      </div>
+      <div class="dev-file-slot">
+        <label>German (guide_de.txt)</label>
+        <div class="drop-zone" id="dropZoneDE">
+          <span>Drop DE guide</span>
+          <input type="file" id="devFileDE" accept=".txt" hidden>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" type="button" onclick="pushGuides()">Push to Repo</button>
+    <div class="status" id="devStatus"></div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -322,16 +428,15 @@
 <script>
 const _cfg = [95, 86, 95, 86, 20, 1, 0, 1, 0];
 const ORIGINAL_TAG = _cfg.map(v => String.fromCharCode(v ^ 0x37)).join('');
-const REPO_OWNER = "Purplexcity";
-const REPO_NAME = "xpr";
+const REPO_OWNER = "Inariaa";
+const REPO_NAME = "rxp_decrypter";
 const BRANCH = "main";
 
-// Optional: paste base64 zlib-compressed guide text here if you want hardcoded local data
-const EMBEDDED_EN_B64 = "";
-const EMBEDDED_DE_B64 = "";
+let EMBEDDED_EN_B64 = "";
+let EMBEDDED_DE_B64 = "";
 
 let _guideCache = {};
-let _localGuideText = { en: null, de: null };
+let _localSourceText = { en: null, de: null };
 let _guideGenerated = false;
 
 function rc4(data, key) {
@@ -394,33 +499,26 @@ function loadPako() {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
     script.onload = resolve;
-    script.onerror = () => reject(new Error("Failed to load pako library"));
+    script.onerror = () => reject(new Error("Failed to load pako from CDN"));
     document.head.appendChild(script);
   });
 }
 
-async function fetchGuide(locale) {
-  if (_guideCache[locale]) return _guideCache[locale];
+async function fetchGuide(locale, forceRefresh = false) {
+  if (_guideCache[locale] && !forceRefresh) return _guideCache[locale];
   const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
   const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${fname}`;
   const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`Remote fetch failed (HTTP ${resp.status})`);
+  if (!resp.ok) throw new Error(`Guide download failed (HTTP ${resp.status})`);
   const data = await resp.text();
-  if (!data.trim()) throw new Error("Remote guide file is empty");
+  if (!data.includes('|')) throw new Error("Invalid guide data");
   _guideCache[locale] = data;
   return data;
 }
 
-function isEncryptedGuideString(rawText) {
-  return /^\s*\d+\|\d+:[A-Za-z0-9+/=]+%/.test(rawText);
-}
-
 function parseEncrypted(data, originalTag) {
-  if (typeof pako === 'undefined') throw new Error("pako is not loaded yet");
-  const m = data.trim().match(/^(\d+)\|(\d+):([A-Za-z0-9+/=]+)%/);
-  if (!m) {
-    throw new Error("Guide string does not match '<count>|<check>:<base64>%' format");
-  }
+  const m = data.match(/^(\d+)\|(\d+):([A-Za-z0-9+/=]+)%/);
+  if (!m) throw new Error("Invalid encrypted guide format");
   const cipherBytes = b64ToBytes(m[3]);
   const key = deriveKey(originalTag);
   const decrypted = rc4(cipherBytes, key);
@@ -428,52 +526,44 @@ function parseEncrypted(data, originalTag) {
   return new TextDecoder().decode(textBytes);
 }
 
-async function decodeSourceText(rawText) {
-  const normalized = rawText.replace(/^\uFEFF/, '');
-  if (isEncryptedGuideString(normalized)) {
-    return parseEncrypted(normalized, ORIGINAL_TAG);
-  }
-  if (/^#name\b/m.test(normalized) || normalized.includes('RXPGuides')) {
-    return normalized;
-  }
-  throw new Error("File is neither a valid encrypted guide string nor plain RXP guide text.");
-}
-
 async function getPlainText(locale) {
-  await loadPako();
-
-  // 1. Prefer locally dropped guide data first
-  if (_localGuideText[locale]) {
-    return decodeSourceText(_localGuideText[locale]);
+  if (_localSourceText[locale]) {
+    const raw = _localSourceText[locale];
+    if (raw.includes('|') && raw.includes(':')) {
+      return parseEncrypted(raw, ORIGINAL_TAG);
+    }
+    return raw;
   }
 
-  // 2. Check embedded base64 fallback if configured
+  try {
+    const data = await fetchGuide(locale);
+    if (data.includes('|') && data.includes(':')) {
+      return parseEncrypted(data, ORIGINAL_TAG);
+    }
+  } catch (e) {
+    console.warn("GitHub fetch failed:", e.message);
+  }
+
   const b64 = locale === 'en' ? EMBEDDED_EN_B64 : EMBEDDED_DE_B64;
   if (b64) {
     const bytes = b64ToBytes(b64);
     return new TextDecoder().decode(new Uint8Array(pako.inflate(bytes)));
   }
 
-  // 3. Fall back to GitHub if no local or embedded data was supplied
-  try {
-    const data = await fetchGuide(locale);
-    return decodeSourceText(data);
-  } catch (err) {
-    throw new Error("No local guide file loaded and remote fetch failed. Drop your guide .txt file above.");
-  }
+  throw new Error("No guide source available. Drop a local .txt file or check network access.");
 }
 
 async function generateGuide() {
   if (_guideGenerated) {
     await navigator.clipboard.writeText(document.getElementById('guideOutput').value);
-    setStatus("Copied! Paste into RXPGuides.", "success");
+    setStatus("Copied to clipboard! Paste into RXPGuides.", "success");
     showToast("Copied to clipboard!");
     return;
   }
 
   const tag = document.getElementById('battletag').value.trim();
   if (!tag) {
-    setStatus("Please enter your BattleTag first.", "error");
+    setStatus("Enter a BattleTag first.", "error");
     return;
   }
   if (!/^[^#]+#\d+$/.test(tag)) {
@@ -485,6 +575,8 @@ async function generateGuide() {
 
   try {
     setStatus("Generating...", "info");
+    await loadPako();
+
     const text = await getPlainText(locale);
     const keyNew = deriveKey(tag);
     const zlibData = new Uint8Array(pako.deflate(new TextEncoder().encode(text), { level: 6 }));
@@ -530,39 +622,28 @@ function resetGeneratedState() {
 document.getElementById('battletag').addEventListener('input', resetGeneratedState);
 document.getElementById('language').addEventListener('change', resetGeneratedState);
 
-function clearLocalGuide() {
+async function checkUpdate() {
   const locale = document.getElementById('language').value;
-  _localGuideText[locale] = null;
-  const zone = document.getElementById('localGuideDrop');
+  try {
+    setStatus("Checking for updates...", "info");
+    const oldData = _guideCache[locale] || null;
+    _guideCache[locale] = null;
+    const data = await fetchGuide(locale, true);
+    setStatus(oldData && oldData === data ? "Already up to date." : "Updated successfully!", "success");
+  } catch (err) {
+    setStatus(`Update failed: ${err.message}`, "error");
+  }
+}
+
+function clearLocalSource() {
+  const locale = document.getElementById('language').value;
+  _localSourceText[locale] = null;
+  const zone = document.getElementById('localSourceDrop');
   zone.classList.remove('has-file');
-  zone.querySelector('span').textContent = "Drop your guide .txt file here (encrypted or plain), or click to choose";
+  zone.querySelector('span').textContent = "Drop a local encrypted or plain guide .txt file here, or click to select";
   resetGeneratedState();
-  setStatus(`Cleared local file for ${locale.toUpperCase()}.`, "info");
+  setStatus(`Cleared local override for ${locale.toUpperCase()}.`, "info");
 }
-
-async function handleLocalFile(file) {
-  const locale = document.getElementById('language').value;
-  _localGuideText[locale] = await file.text();
-  const zone = document.getElementById('localGuideDrop');
-  zone.classList.add('has-file');
-  zone.querySelector('span').textContent = `📄 ${file.name} (${locale.toUpperCase()})`;
-  resetGeneratedState();
-  setStatus(`Loaded ${file.name} for ${locale.toUpperCase()}.`, "info");
-}
-
-const dropZone = document.getElementById('localGuideDrop');
-const fileInput = document.getElementById('localGuideFile');
-dropZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', async (e) => {
-  if (e.target.files.length) await handleLocalFile(e.target.files[0]);
-});
-dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', async (e) => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  if (e.dataTransfer.files.length) await handleLocalFile(e.dataTransfer.files[0]);
-});
 
 function getHistory() {
   try { return JSON.parse(localStorage.getItem('rxp_tags') || '[]'); }
@@ -650,9 +731,154 @@ function playDing() {
   } catch (e) {}
 }
 
+async function fetchLastUpdated(locale) {
+  try {
+    const fname = locale === 'en' ? 'guide.txt' : `guide_${locale}.txt`;
+    const resp = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${fname}&per_page=1`);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data.length ? new Date(data[0].commit.committer.date) : null;
+  } catch (e) { return null; }
+}
+
+async function updateFooter() {
+  const locale = document.getElementById('language').value;
+  const date = await fetchLastUpdated(locale);
+  const base = 'v1.0 local | made by slcker';
+  if (date) {
+    document.getElementById('footerInfo').textContent =
+      `${base} | Updated ${date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}, ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  } else {
+    document.getElementById('footerInfo').textContent = base;
+  }
+}
+
+let _footerClicks = 0;
+function footerClick() {
+  _footerClicks++;
+  if (_footerClicks >= 5) {
+    document.getElementById('devPanel').style.display = 'block';
+    const savedToken = localStorage.getItem('rxp_gh_token');
+    if (savedToken) document.getElementById('ghToken').value = savedToken;
+  }
+}
+
+let _devFileEN = null;
+let _devFileDE = null;
+
+function bindDropZone(zoneId, inputId, onFile) {
+  const zone = document.getElementById(zoneId);
+  const input = document.getElementById(inputId);
+  zone.addEventListener('click', () => input.click());
+  input.addEventListener('change', (e) => {
+    if (e.target.files.length) onFile(e.target.files[0], zone);
+  });
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) onFile(e.dataTransfer.files[0], zone);
+  });
+}
+
+bindDropZone('localSourceDrop', 'localSourceFile', async (file, zone) => {
+  const locale = document.getElementById('language').value;
+  _localSourceText[locale] = await file.text();
+  zone.textContent = `📄 ${locale.toUpperCase()} override: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  zone.classList.add('has-file');
+  resetGeneratedState();
+  setStatus(`Loaded ${file.name} for ${locale.toUpperCase()}.`, "info");
+});
+
+bindDropZone('dropZoneEN', 'devFileEN', (file, zone) => {
+  _devFileEN = file;
+  zone.textContent = `📄 ${file.name}`;
+  zone.classList.add('has-file');
+});
+
+bindDropZone('dropZoneDE', 'devFileDE', (file, zone) => {
+  _devFileDE = file;
+  zone.textContent = `📄 ${file.name}`;
+  zone.classList.add('has-file');
+});
+
+async function pushGuides() {
+  const token = document.getElementById('ghToken').value.trim();
+  if (!token) { setDevStatus("Enter your GitHub token first.", "error"); return; }
+  if (!_devFileEN && !_devFileDE) { setDevStatus("Drop at least one guide file.", "error"); return; }
+  localStorage.setItem('rxp_gh_token', token);
+  const results = [];
+  try {
+    if (_devFileEN) {
+      setDevStatus("Pushing guide.txt...", "info");
+      await pushSingleFile(token, 'guide.txt', _devFileEN);
+      results.push('guide.txt');
+    }
+    if (_devFileDE) {
+      setDevStatus("Pushing guide_de.txt...", "info");
+      await pushSingleFile(token, 'guide_de.txt', _devFileDE);
+      results.push('guide_de.txt');
+    }
+    setDevStatus(`Pushed: ${results.join(', ')}`, "success");
+    showToast("Guide(s) pushed!");
+  } catch (err) {
+    setDevStatus(`Error: ${err.message}`, "error");
+  }
+}
+
+async function pushSingleFile(token, fname, file) {
+  const content = await file.text();
+  let sha = '';
+  const metaResp = await fetch(
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${fname}?ref=${BRANCH}`,
+    { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } }
+  );
+  if (metaResp.ok) {
+    const meta = await metaResp.json();
+    sha = meta.sha;
+  }
+  const b64Content = bytesToB64(new TextEncoder().encode(content));
+  const resp = await fetch(
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${fname}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `Update ${fname} (${new Date().toISOString()})`,
+        content: b64Content,
+        ...(sha ? { sha } : {})
+      })
+    }
+  );
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(`${fname}: ${err.message || 'HTTP ' + resp.status}`);
+  }
+}
+
+function setDevStatus(msg, type) {
+  const el = document.getElementById('devStatus');
+  el.textContent = msg;
+  el.className = 'status' + (type ? ` ${type}` : '');
+}
+
 loadLastTag();
 document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇';
-loadPako().catch(() => {});
+
+(async () => {
+  try {
+    await loadPako();
+    await Promise.allSettled([fetchGuide('en'), fetchGuide('de')]);
+    setStatus("Ready. Enter your BattleTag and click Generate.", "info");
+  } catch (e) {
+    setStatus(`Load issue: ${e.message} — or drop a local .txt file above.`, "error");
+  }
+  updateFooter();
+})();
 </script>
 </body>
 </html>
