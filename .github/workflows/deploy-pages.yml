@@ -1,0 +1,256 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate file sizes, merge markers, HTML structure, inline JS syntax, and relative paths
+        run: |
+          python3 - <<'EOF'
+          import re
+          import subprocess
+          import sys
+          import tempfile
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import unquote
+
+          # File size thresholds (in bytes)
+          warn_limit_bytes = 1 * 1024 * 1024    # 1 MB warning
+          fail_limit_bytes = 10 * 1024 * 1024   # 10 MB hard failure
+
+          skip_dirs = {".git", "node_modules"}
+          oversized_files = []
+          warned_count = 0
+          scanned_files = 0
+
+          for file_path in sorted(Path(".").rglob("*")):
+              if not file_path.is_file():
+                  continue
+              if any(part in skip_dirs for part in file_path.parts):
+                  continue
+              scanned_files += 1
+              size_bytes = file_path.stat().st_size
+              size_mb = size_bytes / (1024 * 1024)
+              if size_bytes > fail_limit_bytes:
+                  oversized_files.append((str(file_path), size_mb))
+              elif size_bytes > warn_limit_bytes:
+                  warned_count += 1
+                  print(
+                      f"::warning file={file_path}::Large repository file '{file_path}' is {size_mb:.2f} MB (> 1.00 MB)."
+                  )
+
+          if oversized_files:
+              for path_str, size_mb in oversized_files:
+                  print(
+                      f"FILE SIZE ERROR: '{path_str}' is {size_mb:.2f} MB (exceeds 10.00 MB limit).",
+                      file=sys.stderr,
+                  )
+              sys.exit(1)
+
+          # Scan repository files for leftover Git merge conflict markers
+          conflict_markers = ("<<<<<<<", "=======", ">>>>>>>")
+          conflict_hits = []
+
+          for file_path in sorted(Path(".").rglob("*")):
+              if not file_path.is_file():
+                  continue
+              if any(part in skip_dirs for part in file_path.parts):
+                  continue
+              try:
+                  raw_bytes = file_path.read_bytes()
+              except OSError as exc:
+                  print(f"ERROR: Could not read {file_path}: {exc}", file=sys.stderr)
+                  sys.exit(1)
+              if b"\x00" in raw_bytes:
+                  continue
+              text = raw_bytes.decode("utf-8", errors="replace")
+              for line_no, line in enumerate(text.splitlines(), start=1):
+                  stripped = line.lstrip()
+                  if any(stripped.startswith(marker) for marker in conflict_markers):
+                      conflict_hits.append((str(file_path), line_no, line.rstrip()))
+
+          if conflict_hits:
+              for path_str, line_no, snippet in conflict_hits:
+                  print(
+                      f"MERGE CONFLICT MARKER in {path_str}:{line_no} -> {snippet}",
+                      file=sys.stderr,
+                  )
+              sys.exit(1)
+
+          html_path = Path("index.html")
+          if not html_path.is_file():
+              print("ERROR: index.html not found in repository root.", file=sys.stderr)
+              sys.exit(1)
+
+          source = html_path.read_text(encoding="utf-8")
+          if not source.strip():
+              print("ERROR: index.html is empty.", file=sys.stderr)
+              sys.exit(1)
+
+          class StrictHTMLChecker(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.void_tags = {
+                      "area", "base", "br", "col", "embed", "hr", "img",
+                      "input", "link", "meta", "param", "source", "track", "wbr"
+                  }
+                  self.tag_stack = []
+                  self.errors = []
+
+              def handle_starttag(self, tag, attrs):
+                  if tag not in self.void_tags:
+                      self.tag_stack.append((tag, self.getpos()))
+
+              def handle_endtag(self, tag):
+                  if tag in self.void_tags:
+                      return
+                  if not self.tag_stack:
+                      self.errors.append(f"Unexpected closing tag </{tag}> at line {self.getpos()[0]}")
+                      return
+                  if self.tag_stack[-1][0] == tag:
+                      self.tag_stack.pop()
+                  else:
+                      matching_idx = None
+                      for i in range(len(self.tag_stack) - 1, -1, -1):
+                          if self.tag_stack[i][0] == tag:
+                              matching_idx = i
+                              break
+                      if matching_idx is not None:
+                          while len(self.tag_stack) - 1 > matching_idx:
+                              unclosed_tag, pos = self.tag_stack.pop()
+                              self.errors.append(f"Unclosed <{unclosed_tag}> opened at line {pos[0]} before </{tag}>")
+                          self.tag_stack.pop()
+                      else:
+                          self.errors.append(f"Mismatched closing tag </{tag}> at line {self.getpos()[0]}")
+
+              def error(self, message):
+                  self.errors.append(message)
+
+          parser = StrictHTMLChecker()
+          parser.feed(source)
+          parser.close()
+
+          for tag, pos in parser.tag_stack:
+              parser.errors.append(f"Unclosed <{tag}> opened at line {pos[0]}")
+
+          if parser.errors:
+              for err in parser.errors:
+                  print(f"HTML ERROR: {err}", file=sys.stderr)
+              sys.exit(1)
+
+          script_matches = list(re.finditer(r"<script\b([^>]*)>([\s\S]*?)</script>", source, flags=re.IGNORECASE))
+          inline_count = 0
+          for idx, match in enumerate(script_matches, start=1):
+              attrs_str, js_code = match.group(1), match.group(2)
+              if re.search(r"\bsrc\s*=", attrs_str, flags=re.IGNORECASE):
+                  continue
+              inline_count += 1
+              with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as tmp:
+                  tmp.write(js_code)
+                  tmp_path = tmp.name
+              try:
+                  res = subprocess.run(
+                      ["node", "--check", tmp_path],
+                      capture_output=True,
+                      text=True
+                  )
+                  if res.returncode != 0:
+                      print(f"JS SYNTAX ERROR in inline <script> #{inline_count}:", file=sys.stderr)
+                      print(res.stderr.strip(), file=sys.stderr)
+                      sys.exit(1)
+              finally:
+                  Path(tmp_path).unlink(missing_ok=True)
+
+          repo_root = Path(".").resolve()
+          candidate_refs = []
+
+          for m in re.finditer(r"""\b(?:src|href)\s*=\s*["']([^"']+)["']""", source, flags=re.IGNORECASE):
+              candidate_refs.append(m.group(1).strip())
+
+          for m in re.finditer(r"""url\(\s*["']?([^"')]+)["']?\s*\)""", source, flags=re.IGNORECASE):
+              candidate_refs.append(m.group(1).strip())
+
+          ignored_prefixes = (
+              "http://", "https://", "//", "data:", "blob:",
+              "mailto:", "tel:", "javascript:", "#"
+          )
+
+          checked_paths = []
+          missing_paths = []
+
+          for raw_ref in candidate_refs:
+              if not raw_ref or raw_ref.startswith(ignored_prefixes):
+                  continue
+              clean_ref = raw_ref.split("?", 1)[0].split("#", 1)[0].strip()
+              if not clean_ref:
+                  continue
+              decoded_ref = unquote(clean_ref)
+              rel_part = decoded_ref.lstrip("/")
+              target = (repo_root / rel_part).resolve()
+              try:
+                  target.relative_to(repo_root)
+              except ValueError:
+                  missing_paths.append((raw_ref, f"Escapes repository root: {decoded_ref}"))
+                  continue
+
+              checked_paths.append(rel_part)
+              if not target.exists():
+                  missing_paths.append((raw_ref, str(target)))
+
+          if missing_paths:
+              for raw_ref, detail in missing_paths:
+                  print(f"MISSING ASSET ERROR: '{raw_ref}' -> {detail}", file=sys.stderr)
+              sys.exit(1)
+
+          print(
+              f"Validation passed: scanned {scanned_files} file(s) ({warned_count} size warning(s)), "
+              f"no merge conflict markers, index.html parsed cleanly, {inline_count} inline script block(s) valid, "
+              f"and {len(set(checked_paths))} relative path(s) verified."
+          )
+          EOF
+
+  deploy:
+    needs: validate
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
